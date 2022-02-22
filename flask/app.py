@@ -1,13 +1,15 @@
-from flask import Flask
+from flask import Flask,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float
 import os
+from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'MetroService.db')
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 
 @app.cli.command('db_create')
 def db_create():
@@ -58,6 +60,18 @@ def db_seed():
 def welcome():
     return 'Hello, this is the Metro Service'
 
+@app.route('/users')
+def users():
+    customer_list = Customer.query.all()
+    result = customers_schema.dump(customer_list)
+    return jsonify(result)
+
+@app.route('/stations')
+def stations():
+    station_list = Station.query.all()
+    result = stations_schema.dump(station_list)
+    return jsonify(result)
+
 class Customer(db.Model):
     __tablename__ = 'customers'
     id = Column(Integer, primary_key=True, unique=True)
@@ -75,6 +89,20 @@ class Station(db.Model):
     train_standby_time = Column(Float)
     first_run_time = Column(String)
     last_run_time = Column(String)
+
+class CustomerSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'name', 'user', 'user_type')
+
+class StationSchema(ma.Schema):
+    class Meta:
+        fields = ('station_id','name','first_run_time','last_run_time')
+
+customer_schema = CustomerSchema()
+customers_schema = CustomerSchema(many = True)
+
+station_schema = StationSchema()
+stations_schema = StationSchema(many = True)
 
 if __name__ == '__main__':
     app.run()
