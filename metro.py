@@ -57,6 +57,8 @@ class Station:
             return current_time[:5]
         if time == 'now':
             focus_time = get_time()
+        else:
+            focus_time = time
 
         all_time = self.station_arrival_time()
 
@@ -176,3 +178,18 @@ class Metro_Route:
             else:
                 self.train_route[stationA.name][stationB.name] = (time,ticket_cost)
                 self.train_route[stationB.name][stationA.name] = (time,ticket_cost)
+
+me = Customer('Film','Film555','1234','0812345678','student')
+me.describe_user()
+print()
+
+A1 = Station('A5','5:30','22:30')
+B3 = Station('B1','5:40','22:40')
+
+A1.arrival_time()
+B3.arrival_time('14:20')
+
+#print(A1.station_arrival_time())
+print()
+Route = Metro_Route()
+Route.get_route(A1,B3)
