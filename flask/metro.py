@@ -13,7 +13,7 @@ class Customer:
         print(f'Customer name: {self.name} \nCustomer type = {self.user_type}')
 
 class Station:
-    def __init__(self,name,first_run_time,last_run_time):
+    def __init__(self,name,first_run_time='05:30',last_run_time='22:30'):
         self.name = name
         self.train_interval_time = 5
         self.train_standby_time = 1
@@ -23,6 +23,11 @@ class Station:
     def describe_station(self):
         print(f'Station: {self.name}\nTrain arrives every {self.train_interval_time} minutes\n'
               f'First train arrive at {self.first_run_time}\nLast train arrives at {self.last_run_time}')
+        return {"station name":self.name,
+                "train interval time": self.train_interval_time,
+                "train_standby_time":self.train_standby_time,
+                "first_run_time":self.first_run_time,
+                "last_run_time":self.last_run_time}
 
     def station_arrival_time(self):
         def add_time(time, min):
@@ -55,6 +60,15 @@ class Station:
             now = datetime.now()
             current_time = now.strftime("%H:%M:%S")
             return current_time[:5]
+
+        def append_diff_time(near_time,each_time,time,offset=0):
+            diff_time = int(station_min) - int(usr_min) + offset
+            if time == 'now':
+                if diff_time > 0:
+                    near_time.append([diff_time, each_time])
+            else:
+                near_time.append([abs(diff_time), each_time])
+
         if time == 'now':
             focus_time = get_time()
         else:
@@ -67,12 +81,12 @@ class Station:
         for each_time in all_time:
             [station_hour, station_min] = each_time.split(':')
             if station_hour == usr_hour:
-                diff_time = int(station_min)- int(usr_min)
-                if time == 'now':
-                    if diff_time > 0:
-                        near_time.append([diff_time, each_time])
-                else:
-                    near_time.append([abs(diff_time), each_time])
+                append_diff_time(near_time,each_time,time)
+            elif int(station_hour) - int(usr_hour) == 1:
+                append_diff_time(near_time, each_time, time,60)
+            elif int(station_hour) - int(usr_hour) == -1:
+                append_diff_time(near_time, each_time, time, -60)
+
         near_time.sort()
         if len(near_time) >= 2:
             print(f"The nearest time that the train arrives station at {focus_time} are {near_time[0][1]} and {near_time[1][1]} "
@@ -165,11 +179,18 @@ class Metro_Route:
             return 1
 
         arrival_time = stationA.arrival_time(time)
-        des_time1 = add_time(arrival_time[0][1], total_time)
-        des_time2 = add_time(arrival_time[1][1], total_time)
-        print(f"You will get to station {stationB.name} at {des_time1} (if you get on the train at {arrival_time[0][1]})\n"
-              f"or {des_time2} (if you get on the train at {arrival_time[1][1]})")
-        #return add_time(arrival_time,total_time)
+        if len(arrival_time)==2:
+            des_time1 = add_time(arrival_time[0][1], total_time)
+            des_time2 = add_time(arrival_time[1][1], total_time)
+            print(f"You will get to station {stationB.name} at {des_time1} (if you get on the train at {arrival_time[0][1]})\n"
+                  f"or {des_time2} (if you get on the train at {arrival_time[1][1]})")
+            return {"get_on_1": arrival_time[0][1], "destinatiion_time_1": des_time1,
+                    "get_on_2": arrival_time[1][1], "destinatiion_time_2": des_time2}
+        elif len(arrival_time) == 1:
+            des_time1 = add_time(arrival_time[0][1], total_time)
+            return {"get_on_1": arrival_time[0][1], "destinatiion_time_1": des_time1}
+        else:
+            return {"get_on_1":"None","destinatiion_time_1":"None"}
 
     def add_station(self,stationA,stationB,time,ticket_cost):
         if stationA.name in self.train_route.keys():
@@ -185,11 +206,14 @@ print()
 
 A1 = Station('A5','5:30','22:30')
 B3 = Station('B1','5:40','22:40')
+B4 = Station('B4')
 
+B4.arrival_time()
 A1.arrival_time()
-B3.arrival_time('14:20')
+B3.arrival_time('15:01')
 
 #print(A1.station_arrival_time())
 print()
 Route = Metro_Route()
 Route.get_route(A1,B3)
+Route.get_destination_time(A1,B3)
