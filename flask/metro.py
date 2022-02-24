@@ -60,6 +60,15 @@ class Station:
             now = datetime.now()
             current_time = now.strftime("%H:%M:%S")
             return current_time[:5]
+
+        def append_diff_time(near_time,each_time,time,offset=0):
+            diff_time = int(station_min) - int(usr_min) + offset
+            if time == 'now':
+                if diff_time > 0:
+                    near_time.append([diff_time, each_time])
+            else:
+                near_time.append([abs(diff_time), each_time])
+
         if time == 'now':
             focus_time = get_time()
         else:
@@ -72,12 +81,12 @@ class Station:
         for each_time in all_time:
             [station_hour, station_min] = each_time.split(':')
             if station_hour == usr_hour:
-                diff_time = int(station_min)- int(usr_min)
-                if time == 'now':
-                    if diff_time > 0:
-                        near_time.append([diff_time, each_time])
-                else:
-                    near_time.append([abs(diff_time), each_time])
+                append_diff_time(near_time,each_time,time)
+            elif int(station_hour) - int(usr_hour) == 1:
+                append_diff_time(near_time, each_time, time,60)
+            elif int(station_hour) - int(usr_hour) == -1:
+                append_diff_time(near_time, each_time, time, -60)
+
         near_time.sort()
         if len(near_time) >= 2:
             print(f"The nearest time that the train arrives station at {focus_time} are {near_time[0][1]} and {near_time[1][1]} "
@@ -201,7 +210,7 @@ B4 = Station('B4')
 
 B4.arrival_time()
 A1.arrival_time()
-B3.arrival_time('14:20')
+B3.arrival_time('15:01')
 
 #print(A1.station_arrival_time())
 print()
