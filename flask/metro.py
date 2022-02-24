@@ -13,7 +13,7 @@ class Customer:
         print(f'Customer name: {self.name} \nCustomer type = {self.user_type}')
 
 class Station:
-    def __init__(self,name,first_run_time,last_run_time):
+    def __init__(self,name,first_run_time='05:30',last_run_time='22:30'):
         self.name = name
         self.train_interval_time = 5
         self.train_standby_time = 1
@@ -23,6 +23,7 @@ class Station:
     def describe_station(self):
         print(f'Station: {self.name}\nTrain arrives every {self.train_interval_time} minutes\n'
               f'First train arrive at {self.first_run_time}\nLast train arrives at {self.last_run_time}')
+        return {"station name":self.name,"train interval time": self.train_interval_time}
 
     def station_arrival_time(self):
         def add_time(time, min):
@@ -185,7 +186,9 @@ print()
 
 A1 = Station('A5','5:30','22:30')
 B3 = Station('B1','5:40','22:40')
+B4 = Station('B4')
 
+B4.arrival_time()
 A1.arrival_time()
 B3.arrival_time('14:20')
 
