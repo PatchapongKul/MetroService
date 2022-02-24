@@ -23,7 +23,11 @@ class Station:
     def describe_station(self):
         print(f'Station: {self.name}\nTrain arrives every {self.train_interval_time} minutes\n'
               f'First train arrive at {self.first_run_time}\nLast train arrives at {self.last_run_time}')
-        return {"station name":self.name,"train interval time": self.train_interval_time}
+        return {"station name":self.name,
+                "train interval time": self.train_interval_time,
+                "train_standby_time":self.train_standby_time,
+                "first_run_time":self.first_run_time,
+                "last_run_time":self.last_run_time}
 
     def station_arrival_time(self):
         def add_time(time, min):
@@ -166,11 +170,18 @@ class Metro_Route:
             return 1
 
         arrival_time = stationA.arrival_time(time)
-        des_time1 = add_time(arrival_time[0][1], total_time)
-        des_time2 = add_time(arrival_time[1][1], total_time)
-        print(f"You will get to station {stationB.name} at {des_time1} (if you get on the train at {arrival_time[0][1]})\n"
-              f"or {des_time2} (if you get on the train at {arrival_time[1][1]})")
-        #return add_time(arrival_time,total_time)
+        if len(arrival_time)==2:
+            des_time1 = add_time(arrival_time[0][1], total_time)
+            des_time2 = add_time(arrival_time[1][1], total_time)
+            print(f"You will get to station {stationB.name} at {des_time1} (if you get on the train at {arrival_time[0][1]})\n"
+                  f"or {des_time2} (if you get on the train at {arrival_time[1][1]})")
+            return {"get_on_1": arrival_time[0][1], "destinatiion_time_1": des_time1,
+                    "get_on_2": arrival_time[1][1], "destinatiion_time_2": des_time2}
+        elif len(arrival_time) == 1:
+            des_time1 = add_time(arrival_time[0][1], total_time)
+            return {"get_on_1": arrival_time[0][1], "destinatiion_time_1": des_time1}
+        else:
+            return {"get_on_1":"None","destinatiion_time_1":"None"}
 
     def add_station(self,stationA,stationB,time,ticket_cost):
         if stationA.name in self.train_route.keys():
@@ -196,3 +207,4 @@ B3.arrival_time('14:20')
 print()
 Route = Metro_Route()
 Route.get_route(A1,B3)
+Route.get_destination_time(A1,B3)
