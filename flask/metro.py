@@ -20,9 +20,9 @@ class Station:
         self.first_run_time = first_run_time
         self.last_run_time = last_run_time
 
-    def describe_station(self):
-        print(f'Station: {self.name}\nTrain arrives every {self.train_interval_time} minutes\n'
-              f'First train arrive at {self.first_run_time}\nLast train arrives at {self.last_run_time}')
+    def describe_station(self,printing= False):
+        if printing: print(f'Station: {self.name}\nTrain arrives every {self.train_interval_time} minutes\n'
+                           f'First train arrive at {self.first_run_time}\nLast train arrives at {self.last_run_time}')
         return {"station name":self.name,
                 "train interval time": self.train_interval_time,
                 "train_standby_time":self.train_standby_time,
@@ -54,7 +54,7 @@ class Station:
         all_time.append(self.last_run_time)
         return all_time
 
-    def arrival_time(self,time = 'now'):
+    def arrival_time(self,time = 'now',printing=False):
         def get_time():
             from datetime import datetime
             now = datetime.now()
@@ -88,14 +88,15 @@ class Station:
                 append_diff_time(near_time, each_time, time, -60)
 
         near_time.sort()
-        if len(near_time) >= 2:
-            print(f"The nearest time that the train arrives station at {focus_time} are {near_time[0][1]} and {near_time[1][1]} "
-                  f"and next {self.train_interval_time + self.train_standby_time} minutes")
-        elif len(near_time) == 1:
-            print(f"The nearest time that the train arrives station at {focus_time} is {near_time[0][1]}"
-                  f"and next {self.train_interval_time} minutes")
-        else:
-            print("Sorry, no trains are operating at that time")
+        if printing:
+            if len(near_time) >= 2:
+                print(f"The nearest time that the train arrives station at {focus_time} are {near_time[0][1]} and {near_time[1][1]} "
+                      f"and next {self.train_interval_time + self.train_standby_time} minutes")
+            elif len(near_time) == 1:
+                print(f"The nearest time that the train arrives station at {focus_time} is {near_time[0][1]}"
+                      f"and next {self.train_interval_time} minutes")
+            else:
+                print("Sorry, no trains are operating at that time")
         return near_time[0:2]
 
 class Metro_Route:
@@ -110,13 +111,14 @@ class Metro_Route:
                             'B3':{'B2':(3,6),'B4':(2,4)},
                             'B4':{'A1':(3,6),'A5':(1,2),'B3':(2,4)},}
 
-    def describe_route(self):
+    def describe_route(self,printing=False):
         station_list = []
         for station in self.train_route:
             station_list.append(station)
-        print(f"The list of all stations in the route are {' -- '.join(station_list)}")
+        if printing: print(f"The list of all stations in the route are {' -- '.join(station_list)}")
+        return self.train_route
 
-    def get_route(self,stationA,stationB,printing=True):
+    def get_route(self,stationA,stationB,printing=False):
         def find_all_paths(graph, start, end, path=[]):
             path = path + [start]
             if start == end:
@@ -157,7 +159,7 @@ class Metro_Route:
             print(f"It will take {total_time} minutes for the trip and the ticket costs {ticket_price} Baht")
         return route, total_time, ticket_price
 
-    def get_destination_time(self,stationA,stationB,time='now'):
+    def get_destination_time(self,stationA,stationB,time='now',printing=False):
         def add_time(time, min):
             [h1, m1] = time.split(':')
             h = int(h1);
@@ -182,8 +184,9 @@ class Metro_Route:
         if len(arrival_time)==2:
             des_time1 = add_time(arrival_time[0][1], total_time)
             des_time2 = add_time(arrival_time[1][1], total_time)
-            print(f"You will get to station {stationB.name} at {des_time1} (if you get on the train at {arrival_time[0][1]})\n"
-                  f"or {des_time2} (if you get on the train at {arrival_time[1][1]})")
+            if printing: print(f"You will get to station {stationB.name} at {des_time1} "
+                               f"(if you get on the train at {arrival_time[0][1]})\n"
+                               f"or {des_time2} (if you get on the train at {arrival_time[1][1]})")
             return {"get_on_1": arrival_time[0][1], "destinatiion_time_1": des_time1,
                     "get_on_2": arrival_time[1][1], "destinatiion_time_2": des_time2}
         elif len(arrival_time) == 1:
