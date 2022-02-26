@@ -5,7 +5,6 @@ import os
 from flask_marshmallow import Marshmallow
 from metro import Station,Metro_Route
 
-
 app = Flask(__name__)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -44,18 +43,83 @@ def db_seed():
         last_run_time = '22:30'
     )
 
-    B3 = Stations(
+    A2 = Stations(
         station_id=2,
+        name='A2',
+        train_interval_time=5,
+        train_standby_time=1,
+        first_run_time='05:30',
+        last_run_time='22:30'
+    )
+
+    A3 = Stations(
+        station_id=3,
+        name='A3',
+        train_interval_time=5,
+        train_standby_time=1,
+        first_run_time='05:30',
+        last_run_time='22:30'
+    )
+
+    A4 = Stations(
+        station_id=4,
+        name='A4',
+        train_interval_time=5,
+        train_standby_time=1,
+        first_run_time='05:30',
+        last_run_time='22:30'
+    )
+
+    A5 = Stations(
+        station_id=5,
+        name='A5',
+        train_interval_time=5,
+        train_standby_time=1,
+        first_run_time='05:30',
+        last_run_time='22:30'
+    )
+
+    B1 = Stations(
+        station_id=6,
+        name='B1',
+        train_interval_time=5,
+        train_standby_time=1,
+        first_run_time='05:30',
+        last_run_time='22:30'
+    )
+
+    B2 = Stations(
+        station_id=7,
+        name='B2',
+        train_interval_time=5,
+        train_standby_time=1,
+        first_run_time='05:30',
+        last_run_time='22:30'
+    )
+
+    B3 = Stations(
+        station_id=8,
         name='B3',
         train_interval_time=5,
         train_standby_time=1,
         first_run_time='05:30',
         last_run_time='22:30'
     )
-    db.session.add(A1)
-    db.session.add(B3)
 
-    db.session.commit()
+    B4 = Stations(
+        station_id=9,
+        name='B4',
+        train_interval_time=5,
+        train_standby_time=1,
+        first_run_time='05:30',
+        last_run_time='22:30'
+    )
+
+    station_list = [A1, A2, A3, A4, A5, B1, B2, B3, B4]
+    for station in station_list:
+        db.session.add(station)
+        db.session.commit()
+
     print("Database seeded")
 
 @app.route('/')
@@ -76,50 +140,87 @@ def stations():
 
 @app.route('/stations/<string:name>')
 def describe_station(name:str):
-    station = Station(name)
-    return station.describe_station()
+    station_list = Stations.query.all()
+    for station in station_list:
+        if name in station.name:
+            ThisStation = Station(name)
+            return ThisStation.describe_station()
+    return {"Error": "invalid station"}
 
 @app.route('/get_arrival_time/<string:name>')
 def get_arrival_time(name:str):
-    station = Station(name)
-    near_time = station.arrival_time()
-    result = dict()
-    if len(near_time) == 0:
-        return jsonify(message = "Sorry, No trains are in service")
-    for i in range(len(near_time)):
-        result[i] = near_time[i][1]
-    return result
+    station_list = Stations.query.all()
+    for station in station_list:
+        if name in station.name:
+            ThisStation = Station(name)
+    try:
+        near_time = ThisStation.arrival_time()
+        result = dict()
+        if len(near_time) == 0:
+            return jsonify(message = "Sorry, No trains are in service")
+        for i in range(len(near_time)):
+            result[i] = near_time[i][1]
+        return result
+
+    except:
+        return {"Error": "invalid station"}
+
 
 @app.route('/get_arrival_time/<string:name>/<string:time>')
 def get_arrival_time_time(name:str,time:str):
-    station = Station(name)
-    near_time = station.arrival_time(time)
-    result = dict()
-    if len(near_time) == 0:
-        return jsonify(message = "Sorry, No trains are in service")
-    for i in range(len(near_time)):
-        result[i] = near_time[i][1]
-    return result
+    station_list = Stations.query.all()
+    for station in station_list:
+        if name in station.name:
+            ThisStation = Station(name)
+
+    try:
+        near_time = ThisStation.arrival_time(time)
+        result = dict()
+        if len(near_time) == 0:
+            return jsonify(message = "Sorry, No trains are in service")
+        for i in range(len(near_time)):
+            result[i] = near_time[i][1]
+        return result
+
+    except:
+        return {"Error": "invalid station"}
 
 @app.route('/get_route/<string:stationA>/<string:stationB>')
 def get_route(stationA:str,stationB:str):
     metro_route = Metro_Route()
-    station_A= Station(stationA)
-    station_B = Station(stationB)
-    route,total_time,ticket_price = metro_route.get_route(station_A,station_B)
-    result = dict()
-    result['route'] = route
-    result['total_time'] = total_time
-    result['ticket_price'] = ticket_price
-    return result
+
+    station_list = Stations.query.all()
+    for station in station_list:
+        if stationA in station.name:
+            stationA_obj = Station(stationA)
+        if stationB in station.name:
+            stationB_obj = Station(stationB)
+
+    try:
+        route,total_time,ticket_price = metro_route.get_route(stationA_obj,stationB_obj)
+        result = dict()
+        result['route'] = route
+        result['total_time'] = total_time
+        result['ticket_price'] = ticket_price
+        return result
+    except:
+        return {"Error": "invalid station"}
 
 @app.route('/get_destination_time/<string:stationA>/<string:stationB>')
 def get_destination_time(stationA:str,stationB:str):
     metro_route = Metro_Route()
-    station_A = Station(stationA)
-    station_B = Station(stationB)
-    result = metro_route.get_destination_time(station_A,station_B,time='now')
-    return result
+
+    station_list = Stations.query.all()
+    for station in station_list:
+        if stationA in station.name:
+            stationA_obj = Station(stationA)
+        if stationB in station.name:
+            stationB_obj = Station(stationB)
+    try:
+        result = metro_route.get_destination_time(stationA_obj,stationB_obj,time='now')
+        return result
+    except:
+        return {"Error": "invalid station"}
 
 class Customer(db.Model):
     __tablename__ = 'customers'
