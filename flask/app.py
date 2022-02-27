@@ -1,6 +1,6 @@
 from flask import Flask,jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
 import os
 from flask_marshmallow import Marshmallow
 from metro import Station,Metro_Route
@@ -33,6 +33,12 @@ def db_seed():
         user_type = 'Student'
     )
     db.session.add(user1)
+
+    wallet1 = Wallets(
+        wallet_id = 1,
+        balance = 500.0
+    )
+    db.session.add(wallet1)
 
     A1 = Stations(
         station_id = 1,
@@ -118,7 +124,7 @@ def db_seed():
     station_list = [A1, A2, A3, A4, A5, B1, B2, B3, B4]
     for station in station_list:
         db.session.add(station)
-        db.session.commit()
+    db.session.commit()
 
     print("Database seeded")
 
@@ -239,6 +245,13 @@ class Stations(db.Model):
     train_standby_time = Column(Float)
     first_run_time = Column(String)
     last_run_time = Column(String)
+
+class Wallets(db.Model):
+    __tablename__ = 'wallets'
+    wallet_id = Column(Integer,primary_key=True, unique=True)
+    #user_id = Column(Integer,ForeignKey('Customers.id'))
+    balance = Column(Float)
+
 
 class CustomerSchema(ma.Schema):
     class Meta:
