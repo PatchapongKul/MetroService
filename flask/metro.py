@@ -203,20 +203,33 @@ class Metro_Route:
                 self.train_route[stationA.name][stationB.name] = (time,ticket_cost)
                 self.train_route[stationB.name][stationA.name] = (time,ticket_cost)
 
-me = Customer('Film','Film555','1234','0812345678','student')
-me.describe_user()
-print()
+class Wallet:
+    def __init__(self,balance = 0):
+        self.balance = balance
 
-A1 = Station('A5','5:30','22:30')
-B3 = Station('B1','5:40','22:40')
-B4 = Station('B4')
+    def check_balance(self):
+        return {"balance": self.balance}
 
-print(B4.arrival_time())
-A1.arrival_time(printing=True)
-B3.arrival_time('15:01')
+    def top_up(self,amount):
+        self.balance += amount
 
-#print(A1.station_arrival_time())
-print()
-Route = Metro_Route()
-Route.get_route(A1,B3)
-Route.get_destination_time(A1,B3)
+    def pay_ticket(self,ticket_price):
+        self.balance -= ticket_price
+
+# me = Customer('Film','Film555','1234','0812345678','student')
+# me.describe_user()
+# print()
+
+# A1 = Station('A5','5:30','22:30')
+# B3 = Station('B1','5:40','22:40')
+# B4 = Station('B4')
+#
+# print(B4.arrival_time())
+# A1.arrival_time(printing=True)
+# B3.arrival_time('15:01')
+#
+# #print(A1.station_arrival_time())
+# print()
+# Route = Metro_Route()
+# Route.get_route(A1,B3)
+# Route.get_destination_time(A1,B3)
