@@ -39,8 +39,8 @@ def db_seed():
         name = 'A1',
         train_interval_time = 5,
         train_standby_time = 1,
-        first_run_time = '05:30',
-        last_run_time = '22:30'
+        first_run_time = '05:46',
+        last_run_time = '22:46'
     )
 
     A2 = Stations(
@@ -48,8 +48,8 @@ def db_seed():
         name='A2',
         train_interval_time=5,
         train_standby_time=1,
-        first_run_time='05:30',
-        last_run_time='22:30'
+        first_run_time='05:50',
+        last_run_time='22:50'
     )
 
     A3 = Stations(
@@ -57,8 +57,8 @@ def db_seed():
         name='A3',
         train_interval_time=5,
         train_standby_time=1,
-        first_run_time='05:30',
-        last_run_time='22:30'
+        first_run_time='05:52',
+        last_run_time='22:52'
     )
 
     A4 = Stations(
@@ -66,8 +66,8 @@ def db_seed():
         name='A4',
         train_interval_time=5,
         train_standby_time=1,
-        first_run_time='05:30',
-        last_run_time='22:30'
+        first_run_time='05:55',
+        last_run_time='22:55'
     )
 
     A5 = Stations(
@@ -75,8 +75,8 @@ def db_seed():
         name='A5',
         train_interval_time=5,
         train_standby_time=1,
-        first_run_time='05:30',
-        last_run_time='22:30'
+        first_run_time='05:59',
+        last_run_time='22:59'
     )
 
     B1 = Stations(
@@ -93,8 +93,8 @@ def db_seed():
         name='B2',
         train_interval_time=5,
         train_standby_time=1,
-        first_run_time='05:30',
-        last_run_time='22:30'
+        first_run_time='05:35',
+        last_run_time='22:35'
     )
 
     B3 = Stations(
@@ -102,8 +102,8 @@ def db_seed():
         name='B3',
         train_interval_time=5,
         train_standby_time=1,
-        first_run_time='05:30',
-        last_run_time='22:30'
+        first_run_time='05:39',
+        last_run_time='22:39'
     )
 
     B4 = Stations(
@@ -111,8 +111,8 @@ def db_seed():
         name='B4',
         train_interval_time=5,
         train_standby_time=1,
-        first_run_time='05:30',
-        last_run_time='22:30'
+        first_run_time='05:42',
+        last_run_time='22:42'
     )
 
     station_list = [A1, A2, A3, A4, A5, B1, B2, B3, B4]
@@ -143,7 +143,7 @@ def describe_station(name:str):
     station_list = Stations.query.all()
     for station in station_list:
         if name in station.name:
-            ThisStation = Station(name)
+            ThisStation = Station(name,station.first_run_time,station.last_run_time)
             return ThisStation.describe_station()
     return {"Error": "invalid station"}
 
@@ -152,9 +152,9 @@ def get_arrival_time(name:str):
     station_list = Stations.query.all()
     for station in station_list:
         if name in station.name:
-            ThisStation = Station(name)
+            ThisStation = Station(name,station.first_run_time,station.last_run_time)
     try:
-        near_time = ThisStation.arrival_time()
+        near_time = ThisStation.arrival_time(time='now')
         result = dict()
         if len(near_time) == 0:
             return jsonify(message = "Sorry, No trains are in service")
@@ -171,7 +171,7 @@ def get_arrival_time_time(name:str,time:str):
     station_list = Stations.query.all()
     for station in station_list:
         if name in station.name:
-            ThisStation = Station(name)
+            ThisStation = Station(name,station.first_run_time,station.last_run_time)
 
     try:
         near_time = ThisStation.arrival_time(time)
@@ -192,9 +192,9 @@ def get_route(stationA:str,stationB:str):
     station_list = Stations.query.all()
     for station in station_list:
         if stationA in station.name:
-            stationA_obj = Station(stationA)
+            stationA_obj = Station(stationA,station.first_run_time,station.last_run_time)
         if stationB in station.name:
-            stationB_obj = Station(stationB)
+            stationB_obj = Station(stationB,station.first_run_time,station.last_run_time)
 
     try:
         route,total_time,ticket_price = metro_route.get_route(stationA_obj,stationB_obj)
@@ -213,9 +213,9 @@ def get_destination_time(stationA:str,stationB:str):
     station_list = Stations.query.all()
     for station in station_list:
         if stationA in station.name:
-            stationA_obj = Station(stationA)
+            stationA_obj = Station(stationA,station.first_run_time,station.last_run_time)
         if stationB in station.name:
-            stationB_obj = Station(stationB)
+            stationB_obj = Station(stationB,station.first_run_time,station.last_run_time)
     try:
         result = metro_route.get_destination_time(stationA_obj,stationB_obj,time='now')
         return result
