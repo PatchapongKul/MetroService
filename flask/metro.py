@@ -80,7 +80,7 @@ class Station:
         near_time = []
         for each_time in all_time:
             [station_hour, station_min] = each_time.split(':')
-            if station_hour == usr_hour:
+            if int(station_hour) == int(usr_hour):
                 append_diff_time(near_time,each_time,time)
             elif int(station_hour) - int(usr_hour) == 1:
                 append_diff_time(near_time, each_time, time,60)
@@ -211,8 +211,8 @@ A1 = Station('A5','5:30','22:30')
 B3 = Station('B1','5:40','22:40')
 B4 = Station('B4')
 
-B4.arrival_time()
-A1.arrival_time()
+print(B4.arrival_time())
+A1.arrival_time(printing=True)
 B3.arrival_time('15:01')
 
 #print(A1.station_arrival_time())
